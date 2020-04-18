@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/punk rocker flame.png-3e8117810587b4c117f92fbc15ae8df9.stex"
+path="res://.import/splash.png-06ad523eafd01cc73836cb6efcf4ad65.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/punk rocker flame.png"
-dest_files=[ "res://.import/punk rocker flame.png-3e8117810587b4c117f92fbc15ae8df9.stex" ]
+source_file="res://Sprites/splash.png"
+dest_files=[ "res://.import/splash.png-06ad523eafd01cc73836cb6efcf4ad65.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=false
+flags/filter=true
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2

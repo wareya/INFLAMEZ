@@ -17,6 +17,8 @@ _global_script_class_icons={
 
 config/name="-10 DEX"
 run/main_scene="res://Main.tscn"
+boot_splash/image="res://Sprites/splash.png"
+boot_splash/use_filter=false
 config/icon="res://icon.png"
 
 [debug]
