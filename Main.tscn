@@ -1,9 +1,10 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://Tile/Tilemap.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/MyChar/MyChar.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Objects/Standtorch.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Objects/StandtorchPrelit.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Music/minus 10 dex scratch music.ogg" type="AudioStream" id=5]
 
 [sub_resource type="CanvasItemMaterial" id=1]
 
@@ -113,6 +114,11 @@ noise = SubResource( 10 )
 
 [node name="Main" type="Node2D"]
 material = SubResource( 1 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = -12.755
+autoplay = true
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
