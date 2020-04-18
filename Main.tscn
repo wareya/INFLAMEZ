@@ -1,0 +1,144 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://Tile/Tilemap.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Objects/MyChar/MyChar.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/Standtorch.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Objects/StandtorchPrelit.tscn" type="PackedScene" id=4]
+
+[sub_resource type="CanvasItemMaterial" id=1]
+
+[sub_resource type="VisualShaderNodeVectorFunc" id=2]
+function = 13
+
+[sub_resource type="VisualShaderNodeVectorOp" id=3]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 6, 6, 6 ) ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeVectorOp" id=4]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 6, 6, 6 ) ]
+operator = 3
+
+[sub_resource type="VisualShaderNodeTexture" id=5]
+source = 2
+
+[sub_resource type="VisualShaderNodeVectorOp" id=6]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 2, 2, 2 ) ]
+
+[sub_resource type="VisualShaderNodeColorOp" id=7]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0, 0.15, 0.2 ) ]
+operator = 1
+
+[sub_resource type="VisualShader" id=8]
+code = "shader_type canvas_item;
+
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Texture:7
+	vec3 n_out7p0;
+	float n_out7p1;
+	{
+		vec4 _tex_read = texture(TEXTURE , UV.xy);
+		n_out7p0 = _tex_read.rgb;
+		n_out7p1 = _tex_read.a;
+	}
+
+// ColorOp:9
+	vec3 n_in9p1 = vec3(0.00000, 0.15000, 0.20000);
+	vec3 n_out9p0 = abs(n_out7p0 - n_in9p1);
+
+// VectorOp:5
+	vec3 n_in5p1 = vec3(6.00000, 6.00000, 6.00000);
+	vec3 n_out5p0 = n_out9p0 * n_in5p1;
+
+// VectorOp:8
+	vec3 n_in8p1 = vec3(2.00000, 2.00000, 2.00000);
+	vec3 n_out8p0 = n_out5p0 + n_in8p1;
+
+// VectorFunc:4
+	vec3 n_out4p0 = ceil(n_out8p0);
+
+// VectorOp:6
+	vec3 n_in6p1 = vec3(6.00000, 6.00000, 6.00000);
+	vec3 n_out6p0 = n_out4p0 / n_in6p1;
+
+// Output:0
+	COLOR.rgb = n_out6p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -443, 70 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 440, 200 )
+nodes/fragment/4/node = SubResource( 2 )
+nodes/fragment/4/position = Vector2( 140, 260 )
+nodes/fragment/5/node = SubResource( 3 )
+nodes/fragment/5/position = Vector2( -40, 60 )
+nodes/fragment/6/node = SubResource( 4 )
+nodes/fragment/6/position = Vector2( 240, 80 )
+nodes/fragment/7/node = SubResource( 5 )
+nodes/fragment/7/position = Vector2( -320, 220 )
+nodes/fragment/8/node = SubResource( 6 )
+nodes/fragment/8/position = Vector2( -40, 240 )
+nodes/fragment/9/node = SubResource( 7 )
+nodes/fragment/9/position = Vector2( -260, 80 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 5, 0, 8, 0, 8, 0, 4, 0, 7, 0, 9, 0, 6, 0, 0, 0, 9, 0, 5, 0 )
+
+[sub_resource type="ShaderMaterial" id=9]
+shader = SubResource( 8 )
+
+[sub_resource type="OpenSimplexNoise" id=10]
+seed = 6835
+octaves = 4
+period = 16.0
+persistence = 0.657
+lacunarity = 4.0
+
+[sub_resource type="NoiseTexture" id=11]
+flags = 3
+width = 64
+height = 32
+noise = SubResource( 10 )
+
+[node name="Main" type="Node2D"]
+material = SubResource( 1 )
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.5, 0.5 )
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
+modulate = Color( 0.235294, 0.258824, 0.317647, 1 )
+material = SubResource( 9 )
+texture = SubResource( 11 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 2048, 2048 )
+
+[node name="Tilemap" parent="." instance=ExtResource( 1 )]
+tile_data = PoolIntArray( 262143, 0, 8, 196608, 0, 10, 196609, 0, 10, 196610, 0, 10, 196611, 0, 11, 327679, 0, 65544, 262144, 0, 131081, 262145, 0, 131081, 262146, 0, 131081, 262147, 0, 131083, 393215, 0, 65544, 327680, 0, 131081, 327681, 0, 131081, 327682, 0, 131081, 327683, 0, 131083, 458751, 0, 65544, 393216, 0, 131081, 393217, 0, 131081, 393218, 0, 131081, 393219, 0, 131083, 524287, 0, 65544, 458752, 0, 131081, 458753, 0, 131081, 458754, 0, 131081, 458755, 0, 131083, 458776, 0, 0, 589823, 0, 65544, 524288, 0, 131081, 524289, 0, 131081, 524290, 0, 131081, 524291, 0, 131083, 524312, 0, 65536, 655359, 0, 65544, 589824, 0, 131081, 589825, 0, 131081, 589826, 0, 131081, 589827, 0, 131083, 589847, 0, 8, 589848, 0, 65543, 720895, 0, 65544, 655360, 0, 131081, 655361, 0, 131081, 655362, 0, 131081, 655363, 0, 131083, 655381, 0, 8, 655382, 0, 10, 655383, 0, 65545, 655384, 0, 196619, 786431, 0, 65544, 720896, 0, 131081, 720897, 0, 131081, 720898, 0, 131081, 720899, 0, 131083, 720912, 0, 8, 720913, 0, 10, 720914, 0, 10, 720915, 0, 10, 720916, 0, 10, 720917, 0, 65541, 720918, 0, 131081, 720919, 0, 131083, 851967, 0, 65544, 786432, 0, 131081, 786433, 0, 131081, 786434, 0, 131081, 786435, 0, 131083, 786448, 0, 65544, 786449, 0, 131081, 786450, 0, 131081, 786451, 0, 131081, 786452, 0, 131081, 786453, 0, 131078, 786454, 0, 196617, 786455, 0, 196614, 786456, 0, 196611, 917503, 0, 65544, 851968, 0, 131081, 851969, 0, 131081, 851970, 0, 131081, 851971, 0, 65542, 851972, 0, 10, 851973, 0, 10, 851974, 0, 10, 851975, 0, 10, 851976, 0, 10, 851977, 0, 10, 851978, 0, 10, 851979, 0, 10, 851980, 0, 10, 851981, 0, 11, 851983, 0, 8, 851984, 0, 65541, 851985, 0, 131081, 851986, 0, 131081, 851987, 0, 131081, 851988, 0, 131078, 851989, 0, 196619, 983039, 0, 65544, 917504, 0, 131081, 917505, 0, 131081, 917506, 0, 131081, 917507, 0, 131081, 917508, 0, 131081, 917509, 0, 131081, 917510, 0, 131081, 917511, 0, 131081, 917512, 0, 131081, 917513, 0, 131081, 917514, 0, 131081, 917515, 0, 131081, 917516, 0, 131081, 917517, 0, 65542, 917518, 0, 10, 917519, 0, 65541, 917520, 0, 131081, 917521, 0, 131081, 917522, 0, 131081, 917523, 0, 131081, 917524, 0, 131083, 1048575, 0, 65544, 983040, 0, 131081, 983041, 0, 131081, 983042, 0, 131081, 983043, 0, 131081, 983044, 0, 131081, 983045, 0, 131081, 983046, 0, 131081, 983047, 0, 131081, 983048, 0, 131081, 983049, 0, 131081, 983050, 0, 131081, 983051, 0, 131081, 983052, 0, 131081, 983053, 0, 131081, 983054, 0, 131081, 983055, 0, 131081, 983056, 0, 131081, 983057, 0, 131081, 983058, 0, 131081, 983059, 0, 131081, 983060, 0, 65542, 983061, 0, 10, 983062, 0, 10, 983063, 0, 10, 983064, 0, 10, 983065, 0, 11, 1114111, 0, 196616, 1048576, 0, 196617, 1048577, 0, 196617, 1048578, 0, 196617, 1048579, 0, 196617, 1048580, 0, 196617, 1048581, 0, 196617, 1048582, 0, 196617, 1048583, 0, 196617, 1048584, 0, 196617, 1048585, 0, 196617, 1048586, 0, 196617, 1048587, 0, 196617, 1048588, 0, 196617, 1048589, 0, 196617, 1048590, 0, 196617, 1048591, 0, 196617, 1048592, 0, 196617, 1048593, 0, 196617, 1048594, 0, 196617, 1048595, 0, 196617, 1048596, 0, 196617, 1048597, 0, 196617, 1048598, 0, 196617, 1048599, 0, 196617, 1048600, 0, 196617, 1048601, 0, 196619 )
+
+[node name="Tilemap2" parent="." instance=ExtResource( 1 )]
+position = Vector2( 51, 121 )
+rotation = -0.492183
+tile_data = PoolIntArray( 393218, 0, 8, 393219, 0, 11, 458754, 0, 65544, 458755, 0, 65542, 458756, 0, 11, 524289, 0, 196609, 524290, 0, 131080, 524291, 0, 131081, 524292, 0, 65542, 524293, 0, 10, 524294, 0, 10, 524295, 0, 11, 589826, 0, 196616, 589827, 0, 131077, 589828, 0, 131081, 589829, 0, 131081, 589830, 0, 131081, 589831, 0, 65542, 589832, 0, 10, 589833, 0, 10, 589834, 0, 11, 655363, 0, 65544, 655364, 0, 131081, 655365, 0, 131081, 655366, 0, 131081, 655367, 0, 131081, 655368, 0, 131081, 655369, 0, 131081, 655370, 0, 65542, 655371, 0, 6, 655372, 0, 196610, 655373, 0, 196611, 720899, 0, 196616, 720900, 0, 196617, 720901, 0, 196617, 720902, 0, 196617, 720903, 0, 196617, 720904, 0, 196617, 720905, 0, 196617, 720906, 0, 196617, 720907, 0, 196619 )
+
+[node name="StandTorchPrelit" parent="." instance=ExtResource( 4 )]
+position = Vector2( 72, 200 )
+
+[node name="StandTorch" parent="." instance=ExtResource( 3 )]
+position = Vector2( 352, 152 )
+
+[node name="MyChar" parent="." instance=ExtResource( 2 )]
+position = Vector2( 96, 200 )
