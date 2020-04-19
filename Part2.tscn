@@ -1,0 +1,204 @@
+[gd_scene load_steps=22 format=2]
+
+[ext_resource path="res://Tile/Tilemap.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Objects/MyChar/MyChar.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/Standtorch.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Objects/StandtorchPrelit.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Main.gd" type="Script" id=5]
+[ext_resource path="res://Objects/Exit.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Tile/Water.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Sprites/hope you can walljump.png" type="Texture" id=8]
+[ext_resource path="res://Tile/Spikes.tscn" type="PackedScene" id=9]
+
+[sub_resource type="CanvasItemMaterial" id=1]
+
+[sub_resource type="VisualShaderNodeVectorFunc" id=2]
+function = 13
+
+[sub_resource type="VisualShaderNodeVectorOp" id=3]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 6, 6, 6 ) ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeVectorOp" id=4]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 6, 6, 6 ) ]
+operator = 3
+
+[sub_resource type="VisualShaderNodeTexture" id=5]
+source = 2
+
+[sub_resource type="VisualShaderNodeVectorOp" id=6]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 2, 2, 2 ) ]
+
+[sub_resource type="VisualShaderNodeColorOp" id=7]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0, 0.15, 0.2 ) ]
+operator = 1
+
+[sub_resource type="VisualShader" id=8]
+code = "shader_type canvas_item;
+
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Texture:7
+	vec3 n_out7p0;
+	float n_out7p1;
+	{
+		vec4 _tex_read = texture(TEXTURE , UV.xy);
+		n_out7p0 = _tex_read.rgb;
+		n_out7p1 = _tex_read.a;
+	}
+
+// ColorOp:9
+	vec3 n_in9p1 = vec3(0.00000, 0.15000, 0.20000);
+	vec3 n_out9p0 = abs(n_out7p0 - n_in9p1);
+
+// VectorOp:5
+	vec3 n_in5p1 = vec3(6.00000, 6.00000, 6.00000);
+	vec3 n_out5p0 = n_out9p0 * n_in5p1;
+
+// VectorOp:8
+	vec3 n_in8p1 = vec3(2.00000, 2.00000, 2.00000);
+	vec3 n_out8p0 = n_out5p0 + n_in8p1;
+
+// VectorFunc:4
+	vec3 n_out4p0 = ceil(n_out8p0);
+
+// VectorOp:6
+	vec3 n_in6p1 = vec3(6.00000, 6.00000, 6.00000);
+	vec3 n_out6p0 = n_out4p0 / n_in6p1;
+
+// Output:0
+	COLOR.rgb = n_out6p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -443, 70 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 440, 200 )
+nodes/fragment/4/node = SubResource( 2 )
+nodes/fragment/4/position = Vector2( 140, 260 )
+nodes/fragment/5/node = SubResource( 3 )
+nodes/fragment/5/position = Vector2( -40, 60 )
+nodes/fragment/6/node = SubResource( 4 )
+nodes/fragment/6/position = Vector2( 240, 80 )
+nodes/fragment/7/node = SubResource( 5 )
+nodes/fragment/7/position = Vector2( -320, 220 )
+nodes/fragment/8/node = SubResource( 6 )
+nodes/fragment/8/position = Vector2( -40, 240 )
+nodes/fragment/9/node = SubResource( 7 )
+nodes/fragment/9/position = Vector2( -260, 80 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 5, 0, 8, 0, 8, 0, 4, 0, 7, 0, 9, 0, 6, 0, 0, 0, 9, 0, 5, 0 )
+
+[sub_resource type="ShaderMaterial" id=9]
+shader = SubResource( 8 )
+
+[sub_resource type="OpenSimplexNoise" id=10]
+seed = 6835
+octaves = 4
+period = 16.0
+persistence = 0.657
+lacunarity = 4.0
+
+[sub_resource type="NoiseTexture" id=11]
+flags = 3
+width = 64
+height = 32
+noise = SubResource( 10 )
+
+[sub_resource type="GDScript" id=12]
+script/source = "extends Sprite
+
+
+func _process(_delta):
+    visible = false
+    for player in get_tree().get_nodes_in_group(\"Player\"):
+        if (global_position - player.global_position).length() < 100:
+            modulate.a = 1-(global_position - player.global_position).length()/100
+            visible = true
+
+"
+
+[node name="Main" type="Node2D"]
+material = SubResource( 1 )
+script = ExtResource( 5 )
+__meta__ = {
+"_edit_horizontal_guides_": [ 496.0 ]
+}
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.5, 0.5 )
+
+[node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer"]
+modulate = Color( 0.235294, 0.258824, 0.317647, 1 )
+material = SubResource( 9 )
+position = Vector2( -3, 0 )
+texture = SubResource( 11 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 2048, 2048 )
+
+[node name="Tilemap4" parent="." instance=ExtResource( 1 )]
+modulate = Color( 0.321569, 0.290196, 0.258824, 1 )
+collision_layer = 0
+occluder_light_mask = 0
+
+[node name="Tilemap3" parent="." instance=ExtResource( 1 )]
+modulate = Color( 0.576471, 0.541176, 0.639216, 1 )
+collision_layer = 0
+occluder_light_mask = 0
+
+[node name="Spikes" parent="." instance=ExtResource( 9 )]
+tile_data = PoolIntArray( -131078, 0, 1, -131076, 0, 1, -7, 0, 0, -5, 0, 0, -3, 0, 0 )
+
+[node name="MyChar" parent="." instance=ExtResource( 2 )]
+position = Vector2( -88, 40 )
+
+[node name="WaterTiles" parent="." instance=ExtResource( 7 )]
+modulate = Color( 1, 1, 1, 0.427451 )
+occluder_light_mask = 0
+
+[node name="Tilemap2" parent="." instance=ExtResource( 1 )]
+position = Vector2( 408, 48 )
+rotation = 0.492183
+
+[node name="Tilemap" parent="." instance=ExtResource( 1 )]
+tile_data = PoolIntArray( -655367, 0, 8, -655366, 0, 10, -655365, 0, 10, -655364, 0, 10, -655363, 0, 10, -655362, 0, 11, -589838, 0, 8, -589837, 0, 10, -589836, 0, 10, -589835, 0, 11, -589831, 0, 65544, -589830, 0, 131081, -589829, 0, 131081, -589828, 0, 131081, -589827, 0, 131081, -589826, 0, 131083, -524303, 0, 8, -524302, 0, 65541, -524301, 0, 131081, -524300, 0, 131081, -524299, 0, 131083, -524295, 0, 65544, -524294, 0, 131081, -524293, 0, 131081, -524292, 0, 131081, -524291, 0, 131081, -524290, 0, 131083, -458767, 0, 65544, -458766, 0, 131081, -458765, 0, 131078, -458764, 0, 196617, -458763, 0, 196619, -458760, 0, 196609, -458759, 0, 131080, -458758, 0, 131081, -458757, 0, 131081, -458756, 0, 131081, -458755, 0, 131081, -458754, 0, 131083, -393231, 0, 65544, -393230, 0, 131081, -393229, 0, 131083, -393223, 0, 65544, -393222, 0, 131081, -393221, 0, 131081, -393220, 0, 131081, -393219, 0, 131081, -393218, 0, 131083, -327695, 0, 65544, -327694, 0, 131081, -327693, 0, 131083, -327687, 0, 65544, -327686, 0, 131081, -327685, 0, 131081, -327684, 0, 131081, -327683, 0, 131081, -327682, 0, 131083, -262159, 0, 65544, -262158, 0, 131081, -262157, 0, 65542, -262156, 0, 10, -262155, 0, 11, -262151, 0, 65544, -262150, 0, 131081, -262149, 0, 131081, -262148, 0, 131081, -262147, 0, 131081, -262146, 0, 131083, -196623, 0, 65544, -196622, 0, 131081, -196621, 0, 131081, -196620, 0, 131081, -196619, 0, 131083, -196616, 0, 196609, -196615, 0, 196613, -196614, 0, 196617, -196613, 0, 196617, -196612, 0, 196617, -196611, 0, 196617, -196610, 0, 196619, -131087, 0, 65544, -131086, 0, 131081, -131085, 0, 131078, -131084, 0, 196617, -131083, 0, 196619, -65551, 0, 65544, -65550, 0, 131081, -65549, 0, 131083, -15, 0, 65544, -14, 0, 131081, -13, 0, 131083, 65521, 0, 65544, 65522, 0, 131081, 65523, 0, 65542, 65524, 0, 10, 65525, 0, 11, 65528, 0, 196609, 65529, 0, 2, 65530, 0, 196610, 65531, 0, 196610, 65532, 0, 5, 65533, 0, 10, 65534, 0, 10, 65535, 0, 10, 0, 0, 10, 1, 0, 11, 131057, 0, 65544, 131058, 0, 131081, 131059, 0, 131081, 131060, 0, 131081, 131061, 0, 131083, 131065, 0, 131072, 131068, 0, 65544, 131069, 0, 131081, 131070, 0, 131081, 131071, 0, 131078, 65536, 0, 196617, 65537, 0, 196619, 196593, 0, 65544, 196594, 0, 131081, 196595, 0, 131081, 196596, 0, 131081, 196597, 0, 131083, 196604, 0, 65544, 196605, 0, 131081, 196606, 0, 131078, 196607, 0, 196619, 262129, 0, 65544, 262130, 0, 131081, 262131, 0, 131081, 262132, 0, 131081, 262133, 0, 65542, 262134, 0, 10, 262135, 0, 10, 262136, 0, 10, 262137, 0, 10, 262138, 0, 10, 262139, 0, 10, 262140, 0, 65541, 262141, 0, 131081, 262142, 0, 131083, 327665, 0, 196616, 327666, 0, 131077, 327667, 0, 131081, 327668, 0, 131081, 327669, 0, 131081, 327670, 0, 131081, 327671, 0, 131081, 327672, 0, 131081, 327673, 0, 131081, 327674, 0, 131081, 327675, 0, 131081, 327676, 0, 131081, 327677, 0, 131081, 327678, 0, 131083, 393202, 0, 196616, 393203, 0, 196617, 393204, 0, 196617, 393205, 0, 196617, 393206, 0, 196617, 393207, 0, 196617, 393208, 0, 196617, 393209, 0, 196617, 393210, 0, 196617, 393211, 0, 196617, 393212, 0, 196617, 393213, 0, 196617, 393214, 0, 196619 )
+
+[node name="StandTorchPrelit" parent="." instance=ExtResource( 4 )]
+position = Vector2( 72, 200 )
+
+[node name="StandTorch" parent="." instance=ExtResource( 3 )]
+position = Vector2( 192, 200 )
+
+[node name="StandTorch2" parent="." instance=ExtResource( 3 )]
+position = Vector2( 392, 120 )
+
+[node name="StandTorch4" parent="." instance=ExtResource( 3 )]
+position = Vector2( 632, 184 )
+
+[node name="StandTorch3" parent="." instance=ExtResource( 3 )]
+position = Vector2( 360, 40 )
+
+[node name="StandTorch5" parent="." instance=ExtResource( 3 )]
+position = Vector2( -136, 40 )
+
+[node name="Exit" parent="." instance=ExtResource( 6 )]
+position = Vector2( -424, 328 )
+target = "res://Main.tscn"
+
+[node name="hope you can walljump" type="Sprite" parent="."]
+position = Vector2( 672, 144 )
+texture = ExtResource( 8 )
+script = SubResource( 12 )
