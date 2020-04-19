@@ -170,7 +170,7 @@ func _physics_process(delta):
             velocity.y *= pow(0.975, delta*120)
     
     var do_floor_snap = true
-    var floor_snap = Vector2(0, min(4, abs(velocity.x)*delta))
+    var floor_snap = Vector2(0, max(1, min(4, abs(velocity.x)*delta)))
     if velocity.y < -50 or just_jumped:
         floor_snap = Vector2(0, 0)
     do_floor_snap = floor_snap.y > 0
@@ -183,8 +183,9 @@ func _physics_process(delta):
     velocity = move_and_slide_with_snap(velocity, floor_snap, Vector2(0, -1), true)
     #else:
     #    velocity = move_and_slide(velocity, Vector2(0, -1), true)
-    if velocity.y < old_velocity_y and is_on_floor() and velocity.y < -bad_slope_limit and old_velocity_y >= -bad_slope_limit:
-        velocity.y = -bad_slope_limit
+    
+    if velocity.y < -bad_slope_limit and velocity.y < old_velocity_y and is_on_wall():
+        velocity.y = old_velocity_y
     
     velocity.y += gravity*delta/2
     
