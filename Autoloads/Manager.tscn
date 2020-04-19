@@ -165,6 +165,7 @@ anims/fadein = SubResource( 1 )
 anims/fadeout = SubResource( 2 )
 
 [node name="BGM" type="AudioStreamPlayer" parent="."]
+bus = "Music"
 
 [node name="Anim" type="AnimationPlayer" parent="BGM"]
 anims/fadeout = SubResource( 3 )

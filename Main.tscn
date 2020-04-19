@@ -166,7 +166,7 @@ position = Vector2( 632, 184 )
 position = Vector2( 360, 40 )
 
 [node name="MyChar" parent="." instance=ExtResource( 2 )]
-position = Vector2( -48, 40 )
+position = Vector2( 16, 184 )
 
 [node name="StandTorch5" parent="." instance=ExtResource( 3 )]
 position = Vector2( -72, 40 )
