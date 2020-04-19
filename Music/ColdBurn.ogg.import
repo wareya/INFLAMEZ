@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/ColdBurn.ogg-ebfa2278de86e875b49f24fe21b0be55.oggstr"
+
+[deps]
+
+source_file="res://Music/ColdBurn.ogg"
+dest_files=[ "res://.import/ColdBurn.ogg-ebfa2278de86e875b49f24fe21b0be55.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=25772.0

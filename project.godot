@@ -21,6 +21,14 @@ boot_splash/image="res://Sprites/splash.png"
 boot_splash/use_filter=false
 config/icon="res://icon.png"
 
+[audio]
+
+default_bus_layout=""
+
+[autoload]
+
+Manager="*res://Autoloads/Manager.tscn"
+
 [debug]
 
 settings/fps/force_fps=120
