@@ -116,7 +116,7 @@ damping_curve = SubResource( 4 )
 [node name="Light2D" type="Light2D" parent="Sprite"]
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
-color = Color( 1, 0.858824, 0.835294, 1 )
+color = Color( 1, 0.858824, 0.835294, 0.647059 )
 shadow_enabled = true
 shadow_buffer_size = 64
 shadow_filter = 1

@@ -64,7 +64,7 @@ func _physics_process(delta):
         Manager.play_oneshot_sound_effect_screenlocal(\"respawn\")
         pass
     
-    $Camera/Fire.visible = Manager.simulate
+    $Canvas/Fire.visible = Manager.simulate
     if Manager.simulate == false:
         return
     var previous_walk_state = walk_state
@@ -191,7 +191,7 @@ func _physics_process(delta):
     velocity = move_and_slide_with_snap(velocity, floor_snap, Vector2(0, -1), true)
     #else:
     #    velocity = move_and_slide(velocity, Vector2(0, -1), true)
-    if velocity.y < old_velocity_y and !is_on_floor() and velocity.y < -bad_slope_limit and old_velocity_y >= -bad_slope_limit:
+    if velocity.y < old_velocity_y and is_on_floor() and velocity.y < -bad_slope_limit and old_velocity_y >= -bad_slope_limit:
         velocity.y = -bad_slope_limit
     
     velocity.y += gravity*delta/2
@@ -220,7 +220,7 @@ func _physics_process(delta):
         life -= delta
     
     Manager.set_danger(life/max_life)
-    $Camera/Fire.value = fire/max_fire*100
+    $Canvas/Fire.value = fire/max_fire*100
     
     $PlayerSprite/Particles.emitting = fire > 0
     $PlayerSprite/Particles.lifetime = max(0.01, max(0, fire)/max_fire)
@@ -472,7 +472,7 @@ position = Vector2( 2, -1 )
 texture = ExtResource( 3 )
 offset = Vector2( 4, 0 )
 texture_scale = 4.0
-color = Color( 1, 0.839216, 0.803922, 1 )
+color = Color( 1, 0.839216, 0.803922, 0.647059 )
 shadow_enabled = true
 shadow_buffer_size = 128
 shadow_filter = 1
@@ -511,18 +511,17 @@ position = Vector2( 0, -4 )
 shape = SubResource( 9 )
 
 [node name="Hull" type="CollisionShape2D" parent="."]
+visible = false
 shape = SubResource( 10 )
 
-[node name="Camera" type="Camera2D" parent="."]
-z_index = 4096
-z_as_relative = false
-current = true
+[node name="Canvas" type="CanvasLayer" parent="."]
 
-[node name="Fire" type="ProgressBar" parent="Camera"]
+[node name="Fire" type="ProgressBar" parent="Canvas"]
 light_mask = 0
-margin_left = 128.0
-margin_right = 192.0
-margin_bottom = 8.0
+margin_left = 296.0
+margin_top = 96.0
+margin_right = 360.0
+margin_bottom = 104.0
 rect_rotation = -90.0
 custom_styles/fg = SubResource( 11 )
 custom_styles/bg = SubResource( 12 )
@@ -531,6 +530,11 @@ percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Camera" type="Camera2D" parent="."]
+z_index = 4096
+z_as_relative = false
+current = true
 [connection signal="body_entered" from="PlayerSprite/FlameSprite/FlameExtinguishArea" to="." method="_on_FlameExtinguishArea_body_entered"]
 [connection signal="body_entered" from="PlayerSprite/WaterDepthTrick" to="." method="_on_WaterDepthTrick_body_entered"]
 [connection signal="body_exited" from="PlayerSprite/WaterDepthTrick" to="." method="_on_WaterDepthTrick_body_exited"]

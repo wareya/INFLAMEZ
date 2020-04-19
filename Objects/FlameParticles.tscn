@@ -6,8 +6,8 @@ max_value = 100.0
 _data = [ Vector2( 0.0729167, -204.8 ), 0.0, 0.0, 0, 0, Vector2( 0.71875, 100 ), 0.0, 0.0, 0, 0, Vector2( 0.984375, 100 ), 0.0, 0.0, 0, 0 ]
 
 [sub_resource type="Gradient" id=2]
-offsets = PoolRealArray( 0, 0.609467, 1 )
-colors = PoolColorArray( 0.933594, 0.35044, 0.306335, 1, 1, 0.705627, 0.289063, 0.764706, 1, 0.679688, 0, 0 )
+offsets = PoolRealArray( 0, 0.609467, 0.876984, 1 )
+colors = PoolColorArray( 0.976563, 0.405581, 0.362396, 1, 1, 0.784881, 0.480469, 0.764706, 1, 1, 1, 0.392157, 1, 0.679688, 0, 0 )
 
 [node name="Particles" type="CPUParticles2D"]
 light_mask = 0
