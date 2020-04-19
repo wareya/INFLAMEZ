@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Sprites/punk rocker.png" type="Texture" id=1]
 [ext_resource path="res://Sprites/punk rocker flame.png" type="Texture" id=2]
@@ -176,8 +176,9 @@ func _physics_process(delta):
     Manager.set_danger(life/max_life)
     $Camera/Fire.value = fire/max_fire*100
     
+    $PlayerSprite/Particles.emitting = fire > 0
     $PlayerSprite/Particles.lifetime = max(0, fire)/max_fire
-    $PlayerSprite/Particles.modulate.a = sqrt(sqrt(max(0, fire)/max_fire))
+    $PlayerSprite/Particles.modulate.a = lerp($PlayerSprite/Particles.modulate.a, sqrt(sqrt(max(0, fire)/max_fire)), 0.1)
     $PlayerSprite/Particles.direction = Vector2(velocity.x * look_direction, velocity.y*0.5).normalized()
     $PlayerSprite/Particles.initial_velocity = velocity.length()*0.5
     
@@ -196,6 +197,24 @@ func _physics_process(delta):
 
 func _on_FlameExtinguishArea_body_entered(body):
     fire = 0
+    pass # Replace with function body.
+
+func defer_cleanup_splash(effect : Node):
+    yield(get_tree().create_timer(1), \"timeout\")
+    remove_child(effect)
+
+func _on_WaterDepthTrick_body_entered(body):
+    var effect = preload(\"res://Objects/Splash.tscn\").instance()
+    effect.emitting = true
+    effect.one_shot = true
+    add_child(effect)
+    defer_cleanup_splash(effect)
+    z_index = 0
+    pass # Replace with function body.
+
+
+func _on_WaterDepthTrick_body_exited(body):
+    z_index = 10
     pass # Replace with function body.
 "
 
@@ -300,6 +319,9 @@ tracks/1/keys = {
 "values": [ Vector2( 0, -1 ), Vector2( 0, 0 ), Vector2( 0, -1 ), Vector2( 0, 0 ) ]
 }
 
+[sub_resource type="RectangleShape2D" id=10]
+extents = Vector2( 3, 6 )
+
 [sub_resource type="ConvexPolygonShape2D" id=7]
 points = PoolVector2Array( -1, -7, 1, -7, 3, -5, 3, 7, 1, 8, -1, 8, -3, 7, -3, -5 )
 
@@ -381,8 +403,14 @@ anims/jump = SubResource( 4 )
 anims/stand = SubResource( 5 )
 anims/walk = SubResource( 6 )
 
+[node name="WaterDepthTrick" type="Area2D" parent="PlayerSprite"]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerSprite/WaterDepthTrick"]
+shape = SubResource( 10 )
+
 [node name="Hull" type="CollisionShape2D" parent="."]
-visible = false
 shape = SubResource( 7 )
 
 [node name="Camera" type="Camera2D" parent="."]
@@ -404,3 +432,5 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 [connection signal="body_entered" from="PlayerSprite/FlameSprite/FlameExtinguishArea" to="." method="_on_FlameExtinguishArea_body_entered"]
+[connection signal="body_entered" from="PlayerSprite/WaterDepthTrick" to="." method="_on_WaterDepthTrick_body_entered"]
+[connection signal="body_exited" from="PlayerSprite/WaterDepthTrick" to="." method="_on_WaterDepthTrick_body_exited"]
