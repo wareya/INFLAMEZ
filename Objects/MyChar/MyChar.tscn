@@ -139,9 +139,8 @@ func _physics_process(delta):
     if Input.is_action_just_released(\"jump\") and velocity.y < 0:
         velocity.y /= 2
     
-    # I have no idea what I added this to fix but it broke things
-    #if is_on_floor() and walk_state != previous_walk_state:
-    #    velocity.y = 0
+    if is_on_floor() and walk_state == 0 and previous_walk_state != 0 and velocity.y < 0 and !just_jumped:
+        velocity.y = 0
     
     for torch in get_tree().get_nodes_in_group(\"StandTorch\"):
         if torch.overlaps_body(self):
@@ -401,16 +400,16 @@ tracks/1/keys = {
 [sub_resource type="RectangleShape2D" id=7]
 extents = Vector2( 3, 6 )
 
-[sub_resource type="RectangleShape2D" id=11]
+[sub_resource type="RectangleShape2D" id=8]
 extents = Vector2( 2.5, 6.5 )
 
-[sub_resource type="CircleShape2D" id=12]
+[sub_resource type="CircleShape2D" id=9]
 radius = 2.5
 
-[sub_resource type="ConvexPolygonShape2D" id=8]
+[sub_resource type="ConvexPolygonShape2D" id=10]
 points = PoolVector2Array( -1, -7, 1, -7, 3, -5, 3, 0, 2, 8, -2, 8, -3, 0, -3, -5 )
 
-[sub_resource type="StyleBoxFlat" id=9]
+[sub_resource type="StyleBoxFlat" id=11]
 bg_color = Color( 0.901961, 0.431373, 0.32549, 1 )
 border_width_left = 1
 border_width_top = 1
@@ -419,7 +418,7 @@ border_width_bottom = 1
 border_color = Color( 0, 0, 0, 0 )
 anti_aliasing = false
 
-[sub_resource type="StyleBoxFlat" id=10]
+[sub_resource type="StyleBoxFlat" id=12]
 bg_color = Color( 0.231373, 0.231373, 0.231373, 0.333333 )
 border_width_left = 1
 border_width_top = 1
@@ -504,15 +503,15 @@ collision_mask = 8
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerSprite/Death"]
 visible = false
 position = Vector2( 0, 1 )
-shape = SubResource( 11 )
+shape = SubResource( 8 )
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="PlayerSprite/Death"]
 visible = false
 position = Vector2( 0, -4 )
-shape = SubResource( 12 )
+shape = SubResource( 9 )
 
 [node name="Hull" type="CollisionShape2D" parent="."]
-shape = SubResource( 8 )
+shape = SubResource( 10 )
 
 [node name="Camera" type="Camera2D" parent="."]
 z_index = 4096
@@ -525,8 +524,8 @@ margin_left = 128.0
 margin_right = 192.0
 margin_bottom = 8.0
 rect_rotation = -90.0
-custom_styles/fg = SubResource( 9 )
-custom_styles/bg = SubResource( 10 )
+custom_styles/fg = SubResource( 11 )
+custom_styles/bg = SubResource( 12 )
 rounded = true
 percent_visible = false
 __meta__ = {
