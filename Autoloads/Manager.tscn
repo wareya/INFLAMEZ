@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Autoloads/Manager.gd" type="Script" id=1]
+[ext_resource path="res://Sprites/vignette frame.png" type="Texture" id=2]
 [ext_resource path="res://Sprites/splash.png" type="Texture" id=3]
 
 [sub_resource type="Animation" id=1]
@@ -149,6 +150,11 @@ tracks/1/keys = {
 script = ExtResource( 1 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Vignette" type="Sprite" parent="CanvasLayer"]
+scale = Vector2( 10, 10 )
+texture = ExtResource( 2 )
+centered = false
 
 [node name="Danger" type="Polygon2D" parent="CanvasLayer"]
 modulate = Color( 0.0745098, 0.0627451, 0.0627451, 0 )

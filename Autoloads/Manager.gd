@@ -35,6 +35,11 @@ func play_bgm(music = null):
         $BGM.play()
         print("playing " + file)
 
+func play_oneshot_sound_effect(global_position : Vector2):
+    pass
+
+func play_oneshot_sound_effect_screenlocal(global_position : Vector2):
+    pass
 
 func fadein_end():
     emit_signal("fadein_done")
@@ -55,7 +60,7 @@ func _onready():
     $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
 
 func set_danger(danger : float):
-    $CanvasLayer/Danger.modulate.a = pow(1-danger, 2)
+    $CanvasLayer/Danger.modulate.a = 1-pow(danger, 2)
     if danger <= 0:
         $CanvasLayer/Overlay.texture = preload("res://Sprites/death.png")
         $AnimationPlayer.current_animation = "fadeout"
