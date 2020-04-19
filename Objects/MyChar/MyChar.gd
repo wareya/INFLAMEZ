@@ -113,20 +113,43 @@ func _physics_process(delta):
         want_to_jump = false
         just_jumped = true
         Manager.play_oneshot_sound_effect_screenlocal("jump")
+        $JumpParticles.restart()
+        $JumpParticles.emitting = true
     
-    if walljumping_enabled and want_to_jump and is_on_wall():
-        var walldir = get_which_wall_collided()
-        if walldir != 0 and (last_walljump_dir != walldir or second_walljump_timer <= 0):
-            last_walljump_dir = walldir
-            velocity.y = -jumpspeed*0.8
-            velocity.x = topspeed*walldir
-            walljump_xvel = velocity.x
-            walljump_timer = walljump_timer_max
-            second_walljump_timer = second_walljump_timer_max
-            want_to_jump = false
-            just_jumped = true
-            fire -= walljump_consumed_fire
-            Manager.play_oneshot_sound_effect_screenlocal("jump")
+    $WallGrindParticles.emitting = false
+    
+    if walljumping_enabled:
+        var scan_left_result = null
+        var scan_right_result = null
+        if (velocity.x <= 0 or !is_on_floor()):
+            scan_left_result = move_and_collide(Vector2(-1.5, 0), true, true, true)
+        if (velocity.x >= 0 or !is_on_floor()) and scan_left_result == null:
+            scan_right_result = move_and_collide(Vector2(1.5, 0), true, true, true)
+        if is_on_wall() or scan_left_result or scan_right_result:
+            var walldir = get_which_wall_collided()
+            if walldir == 0 and scan_left_result != null and scan_left_result.normal.x > 0.9:
+                walldir = 1
+            if walldir == 0 and scan_right_result != null and scan_right_result.normal.x < -0.9:
+                walldir = -1
+            if walldir != 0 and (last_walljump_dir != walldir or second_walljump_timer <= 0):
+                if true:#velocity.x == 0 or sign(velocity.x) != sign(walldir):
+                    $WallGrindParticles.emitting = true
+                    $WallGrindParticles.position.x = -4*walldir
+                if want_to_jump:
+                    last_walljump_dir = walldir
+                    velocity.y = -jumpspeed*0.8
+                    velocity.x = topspeed*walldir
+                    walljump_xvel = velocity.x
+                    walljump_timer = walljump_timer_max
+                    second_walljump_timer = second_walljump_timer_max
+                    want_to_jump = false
+                    just_jumped = true
+                    fire -= walljump_consumed_fire
+                    Manager.play_oneshot_sound_effect_screenlocal("jump")
+                    $WallJumpParticles.restart()
+                    $WallJumpParticles.direction.x = float(walldir)
+                    $WallJumpParticles.emitting = true
+                    $WallJumpParticles.position.x = -4*walldir
     
     if Input.is_action_just_released("jump") and velocity.y < 0:
         velocity.y /= 2
@@ -141,10 +164,17 @@ func _physics_process(delta):
                 if !torch.lit:
                     played_sound = true
                     Manager.play_oneshot_sound_effect("torchlight", global_position)
+                    $PlayerSprite/FlameBlastParticles.restart()
+                    $PlayerSprite/FlameBlastParticles.emitting = true
                 torch.lit = true
             if torch.lit:
-                if fire <= 0:
+                if fire <= 0 and !played_sound:
+                    played_sound = true
                     Manager.play_oneshot_sound_effect("torchlight", global_position)
+                    $PlayerSprite/FlameBlastParticles.restart()
+                    $PlayerSprite/FlameBlastParticles.emitting = true
+                elif fire < max_fire*0.75 and !played_sound:
+                    Manager.play_oneshot_sound_effect("torchlightmini", global_position)
                 fire = max_fire
     
     if fire > 0:
@@ -189,8 +219,15 @@ func _physics_process(delta):
     
     velocity.y += gravity*delta/2
     
-    if old_velocity_y > 50 and !old_is_on_floor and is_on_floor():
-        Manager.play_oneshot_sound_effect_screenlocal("land")
+    if !old_is_on_floor and is_on_floor():
+        if old_velocity_y > 100:
+            Manager.play_oneshot_sound_effect_screenlocal("land")
+            $LandParticles.restart()
+            $LandParticles.emitting = true
+        elif old_velocity_y > 50:
+            Manager.play_oneshot_sound_effect_screenlocal("landmini")
+            $LandParticles.restart()
+            $LandParticles.emitting = true
     
     $Camera.position = Vector2(0, 0)
     $Camera.global_position.x = round($Camera.global_position.x)

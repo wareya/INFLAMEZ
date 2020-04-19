@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=2]
+
+[sub_resource type="CanvasItemMaterial" id=1]
+blend_mode = 1
+
+[sub_resource type="Curve" id=2]
+min_value = -204.8
+max_value = 100.0
+_data = [ Vector2( 0, -85.6509 ), 0.0, 0.0, 0, 0, Vector2( 0.0727273, 94.4582 ), 0.0, 0.0, 0, 0, Vector2( 0.130909, 72.2909 ), 0.0, 0.0, 0, 0, Vector2( 0.243636, -110.589 ), 0.0, 0.0, 0, 0, Vector2( 0.996364, -182.633 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="Gradient" id=3]
+offsets = PoolRealArray( 0, 0.609467, 0.876984, 1 )
+colors = PoolColorArray( 0.976563, 0.405581, 0.362396, 1, 1, 0.784881, 0.480469, 0.764706, 1, 1, 1, 0.392157, 1, 0.679688, 0, 0 )
+
+[node name="Particles" type="CPUParticles2D"]
+modulate = Color( 0.862745, 0.835294, 0.827451, 1 )
+light_mask = 0
+material = SubResource( 1 )
+z_index = -1
+amount = 30
+one_shot = true
+speed_scale = 0.37
+explosiveness = 0.94
+lifetime_randomness = 1.0
+local_coords = false
+emission_shape = 2
+emission_rect_extents = Vector2( 2, 2 )
+direction = Vector2( 0, -1 )
+gravity = Vector2( 0, -40 )
+initial_velocity = 40.0
+initial_velocity_random = 0.5
+damping = 49.65
+damping_curve = SubResource( 2 )
+scale_amount = 1.5
+scale_amount_random = 1.0
+color_ramp = SubResource( 3 )
+hue_variation = 0.05
+hue_variation_random = 1.0
