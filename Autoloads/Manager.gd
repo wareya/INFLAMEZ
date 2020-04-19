@@ -35,15 +35,30 @@ func play_bgm(music = null):
         $BGM.play()
         print("playing " + file)
 
-func play_oneshot_sound_effect(global_position : Vector2):
+func play_oneshot_sound_effect(name : String, _global_position : Vector2):
+    var effect = load("res://Sounds/"+name+".wav")
+    var player = AudioStreamPlayer2D.new()
+    player.stream = effect
+    player.global_position = _global_position
+    player.play()
+    add_child(player)
+    yield(player, "finished")
+    remove_child(player)
     pass
 
-func play_oneshot_sound_effect_screenlocal(global_position : Vector2):
+func play_oneshot_sound_effect_screenlocal(name : String):
+    var effect = load("res://Sounds/"+name+".wav")
+    var player = AudioStreamPlayer.new()
+    player.stream = effect
+    player.play()
+    add_child(player)
+    yield(player, "finished")
+    remove_child(player)
     pass
 
 func fadein_end():
     emit_signal("fadein_done")
-    $AnimationPlayer.current_animation = "stop"
+    #$AnimationPlayer.stop()
     simulate = true
 
 func fadein_start():
@@ -51,10 +66,10 @@ func fadein_start():
         
 func fadeout_end():
     emit_signal("fadeout_done")
-    $AnimationPlayer.current_animation = "stop"
+    #$AnimationPlayer.stop()
 
 func fadeout_start():
-    simulate = false\
+    simulate = false
 
 func _onready():
     $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")

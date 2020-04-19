@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/torchlight.wav-fc82a6d2564c77d1d9168a70a95b53a1.sample"
+
+[deps]
+
+source_file="res://Sounds/torchlight.wav"
+dest_files=[ "res://.import/torchlight.wav-fc82a6d2564c77d1d9168a70a95b53a1.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

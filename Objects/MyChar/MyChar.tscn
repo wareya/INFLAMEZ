@@ -48,11 +48,14 @@ func get_which_wall_collided():
 
 var was_on_ground_last_frame = false
 
+var in_water = false
+
 func _physics_process(delta):
     if Input.is_action_just_pressed(\"restart\") and life <= 0:
         Manager.reload_level()
         life = max_life
         fire = max_fire
+        Manager.play_oneshot_sound_effect_screenlocal(\"respawn\")
         pass
     
     $Camera/Fire.visible = Manager.simulate
@@ -100,6 +103,7 @@ func _physics_process(delta):
     if want_to_jump and (is_on_floor() or was_on_ground_last_frame):
         velocity.y = -jumpspeed
         want_to_jump = false
+        Manager.play_oneshot_sound_effect_screenlocal(\"jump\")
     was_on_ground_last_frame = is_on_floor()
     if walljumping_enabled and want_to_jump and is_on_wall():
         var walldir = get_which_wall_collided()
@@ -112,6 +116,7 @@ func _physics_process(delta):
             second_walljump_timer = second_walljump_timer_max
             want_to_jump = false
             fire -= walljump_consumed_fire
+            Manager.play_oneshot_sound_effect_screenlocal(\"jump\")
     
     if Input.is_action_just_released(\"jump\") and velocity.y < 0:
         velocity.y /= 2
@@ -121,9 +126,15 @@ func _physics_process(delta):
     
     for torch in get_tree().get_nodes_in_group(\"StandTorch\"):
         if torch.overlaps_body(self):
+            var played_sound = false
             if fire > 0:
-                torch.lit = fire
+                if !torch.lit:
+                    played_sound = true
+                    Manager.play_oneshot_sound_effect(\"torchlight\", global_position)
+                torch.lit = true
             if torch.lit:
+                if fire <= 0:
+                    Manager.play_oneshot_sound_effect(\"torchlight\", global_position)
                 fire = max_fire
     
     if fire > 0:
@@ -136,16 +147,22 @@ func _physics_process(delta):
                 else:
                     $PlayerSprite/Anim.current_animation = \"jump\"
                 return
-                
-    
     
     velocity.y += gravity*delta/2
     
-    var floor_snap = Vector2(0, 4)
+    if in_water:
+        velocity.x *= pow(0.95, delta*120)
+        if velocity.y > 0:
+            velocity.y *= pow(0.95, delta*120)
+        else:
+            velocity.y *= pow(0.975, delta*120)
+    
+    var floor_snap = Vector2(0, min(4, abs(velocity.x)))
     if velocity.y < -50:
         floor_snap = Vector2(0, 0)
     
     var old_velocity_y = velocity.y
+    var old_is_on_floor = is_on_floor()
     
     velocity = move_and_slide_with_snap(velocity, floor_snap, Vector2(0, -1), true)
     if velocity.y < old_velocity_y and !is_on_floor() and velocity.y < -bad_slope_limit:
@@ -153,7 +170,8 @@ func _physics_process(delta):
     
     velocity.y += gravity*delta/2
     
-    
+    if old_velocity_y > 50 and !old_is_on_floor and is_on_floor():
+        Manager.play_oneshot_sound_effect_screenlocal(\"land\")
     
     $Camera.position = Vector2(0, 0)
     $Camera.global_position.x = round($Camera.global_position.x)
@@ -168,6 +186,8 @@ func _physics_process(delta):
         $PlayerSprite/FlameSprite/Light.energy = sqrt(fire/max_fire)
         $PlayerSprite/FlameSprite.visible = true
         life = max_life
+        if fire <= 0:
+            Manager.play_oneshot_sound_effect(\"torchgoesout\", global_position)
     else:
         $PlayerSprite/FlameSprite/Light.energy = 0
         $PlayerSprite/FlameSprite.visible = false
@@ -177,7 +197,7 @@ func _physics_process(delta):
     $Camera/Fire.value = fire/max_fire*100
     
     $PlayerSprite/Particles.emitting = fire > 0
-    $PlayerSprite/Particles.lifetime = max(0, fire)/max_fire
+    $PlayerSprite/Particles.lifetime = max(0.01, max(0, fire)/max_fire)
     $PlayerSprite/Particles.modulate.a = lerp($PlayerSprite/Particles.modulate.a, sqrt(sqrt(max(0, fire)/max_fire)), 0.1)
     $PlayerSprite/Particles.direction = Vector2(velocity.x * look_direction, velocity.y*0.5).normalized()
     $PlayerSprite/Particles.initial_velocity = velocity.length()*0.5
@@ -196,6 +216,8 @@ func _physics_process(delta):
 
 
 func _on_FlameExtinguishArea_body_entered(body):
+    if fire > 0:
+        Manager.play_oneshot_sound_effect(\"torchgoesout\", global_position)
     fire = 0
     pass # Replace with function body.
 
@@ -209,12 +231,17 @@ func _on_WaterDepthTrick_body_entered(body):
     effect.one_shot = true
     add_child(effect)
     defer_cleanup_splash(effect)
+    Manager.play_oneshot_sound_effect(\"splash\", global_position)
     z_index = 0
+    $PlayerSprite/Particles.z_index = 0
+    in_water = true
     pass # Replace with function body.
 
 
 func _on_WaterDepthTrick_body_exited(body):
     z_index = 10
+    $PlayerSprite/Particles.z_index = -1
+    in_water = false
     pass # Replace with function body.
 "
 
@@ -319,13 +346,13 @@ tracks/1/keys = {
 "values": [ Vector2( 0, -1 ), Vector2( 0, 0 ), Vector2( 0, -1 ), Vector2( 0, 0 ) ]
 }
 
-[sub_resource type="RectangleShape2D" id=10]
+[sub_resource type="RectangleShape2D" id=7]
 extents = Vector2( 3, 6 )
 
-[sub_resource type="ConvexPolygonShape2D" id=7]
+[sub_resource type="ConvexPolygonShape2D" id=8]
 points = PoolVector2Array( -1, -7, 1, -7, 3, -5, 3, 7, 1, 8, -1, 8, -3, 7, -3, -5 )
 
-[sub_resource type="StyleBoxFlat" id=8]
+[sub_resource type="StyleBoxFlat" id=9]
 bg_color = Color( 0.901961, 0.431373, 0.32549, 1 )
 border_width_left = 1
 border_width_top = 1
@@ -334,7 +361,7 @@ border_width_bottom = 1
 border_color = Color( 0, 0, 0, 0 )
 anti_aliasing = false
 
-[sub_resource type="StyleBoxFlat" id=9]
+[sub_resource type="StyleBoxFlat" id=10]
 bg_color = Color( 0.231373, 0.231373, 0.231373, 0.333333 )
 border_width_left = 1
 border_width_top = 1
@@ -374,7 +401,7 @@ texture = ExtResource( 2 )
 hframes = 2
 
 [node name="FlameExtinguishArea" type="Area2D" parent="PlayerSprite/FlameSprite"]
-position = Vector2( 3, -1 )
+position = Vector2( 3, -1.5 )
 collision_layer = 0
 collision_mask = 4
 
@@ -408,10 +435,10 @@ collision_layer = 0
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerSprite/WaterDepthTrick"]
-shape = SubResource( 10 )
+shape = SubResource( 7 )
 
 [node name="Hull" type="CollisionShape2D" parent="."]
-shape = SubResource( 7 )
+shape = SubResource( 8 )
 
 [node name="Camera" type="Camera2D" parent="."]
 z_index = 4096
@@ -424,8 +451,8 @@ margin_left = 128.0
 margin_right = 192.0
 margin_bottom = 8.0
 rect_rotation = -90.0
-custom_styles/fg = SubResource( 8 )
-custom_styles/bg = SubResource( 9 )
+custom_styles/fg = SubResource( 9 )
+custom_styles/bg = SubResource( 10 )
 rounded = true
 percent_visible = false
 __meta__ = {
