@@ -90,6 +90,8 @@ func _physics_process(delta):
         velocity.x = lerp(walljump_xvel, walk_state * topspeed, 1-derp)
         walljump_timer -= delta
     
+    var just_jumped = false
+    
     if Input.is_action_just_pressed(\"jump\"):
         walljump_timer = 0
         want_to_jump = true
@@ -103,6 +105,7 @@ func _physics_process(delta):
     if want_to_jump and (is_on_floor() or was_on_ground_last_frame):
         velocity.y = -jumpspeed
         want_to_jump = false
+        just_jumped = true
         Manager.play_oneshot_sound_effect_screenlocal(\"jump\")
     was_on_ground_last_frame = is_on_floor()
     if walljumping_enabled and want_to_jump and is_on_wall():
@@ -115,6 +118,7 @@ func _physics_process(delta):
             walljump_timer = walljump_timer_max
             second_walljump_timer = second_walljump_timer_max
             want_to_jump = false
+            just_jumped = true
             fire -= walljump_consumed_fire
             Manager.play_oneshot_sound_effect_screenlocal(\"jump\")
     
@@ -157,15 +161,21 @@ func _physics_process(delta):
         else:
             velocity.y *= pow(0.975, delta*120)
     
-    var floor_snap = Vector2(0, min(4, abs(velocity.x)))
-    if velocity.y < -50:
+    var do_floor_snap = true
+    var floor_snap = Vector2(0, min(4, abs(velocity.x)*delta))
+    if velocity.y < -50 or just_jumped:
         floor_snap = Vector2(0, 0)
+    do_floor_snap = floor_snap.y > 0
+    do_floor_snap = false
     
     var old_velocity_y = velocity.y
     var old_is_on_floor = is_on_floor()
     
-    velocity = move_and_slide_with_snap(velocity, floor_snap, Vector2(0, -1), true)
-    if velocity.y < old_velocity_y and !is_on_floor() and velocity.y < -bad_slope_limit:
+    if do_floor_snap:
+        velocity = move_and_slide_with_snap(velocity, floor_snap, Vector2(0, -1), true)
+    else:
+        velocity = move_and_slide(velocity, Vector2(0, -1), true)
+    if velocity.y < old_velocity_y and !is_on_floor() and velocity.y < -bad_slope_limit and old_velocity_y >= -bad_slope_limit:
         velocity.y = -bad_slope_limit
     
     velocity.y += gravity*delta/2
