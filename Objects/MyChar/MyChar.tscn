@@ -107,7 +107,7 @@ func _physics_process(delta):
         want_to_jump = false
         just_jumped = true
         Manager.play_oneshot_sound_effect_screenlocal(\"jump\")
-    was_on_ground_last_frame = is_on_floor()
+    
     if walljumping_enabled and want_to_jump and is_on_wall():
         var walldir = get_which_wall_collided()
         if walldir != 0 and (last_walljump_dir != walldir or second_walljump_timer <= 0):
@@ -125,8 +125,9 @@ func _physics_process(delta):
     if Input.is_action_just_released(\"jump\") and velocity.y < 0:
         velocity.y /= 2
     
-    if is_on_floor() and walk_state != previous_walk_state:
-        velocity.y = 0
+    # I have no idea what I added this to fix but it broke things
+    #if is_on_floor() and walk_state != previous_walk_state:
+    #    velocity.y = 0
     
     for torch in get_tree().get_nodes_in_group(\"StandTorch\"):
         if torch.overlaps_body(self):
@@ -151,6 +152,8 @@ func _physics_process(delta):
                 else:
                     $PlayerSprite/Anim.current_animation = \"jump\"
                 return
+    
+    was_on_ground_last_frame = is_on_floor()
     
     velocity.y += gravity*delta/2
     
@@ -212,7 +215,7 @@ func _physics_process(delta):
     $PlayerSprite/Particles.direction = Vector2(velocity.x * look_direction, velocity.y*0.5).normalized()
     $PlayerSprite/Particles.initial_velocity = velocity.length()*0.5
     
-    if !is_on_floor():
+    if !is_on_floor():# and !was_on_ground_last_frame:
         $PlayerSprite/Anim.current_animation = \"jump\"
     elif abs(velocity.x) > 1 or walk_state != 0:
         if $PlayerSprite/Anim.current_animation != \"walk\":
