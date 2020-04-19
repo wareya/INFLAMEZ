@@ -132,7 +132,7 @@ func _physics_process(delta):
             if walldir == 0 and scan_right_result != null and scan_right_result.normal.x < -0.9:
                 walldir = -1
             if walldir != 0 and (last_walljump_dir != walldir or second_walljump_timer <= 0):
-                if true:#velocity.x == 0 or sign(velocity.x) != sign(walldir):
+                if velocity.x == 0 or sign(velocity.x) != sign(walldir):
                     $WallGrindParticles.emitting = true
                     $WallGrindParticles.position.x = -4*walldir
                 if want_to_jump:
@@ -250,7 +250,7 @@ func _physics_process(delta):
         life -= delta
     
     Manager.set_danger(life/max_life)
-    $Canvas/Fire.value = fire/max_fire*100
+    $Canvas/Fire.value = fire/max_fire*100*1.01
     
     $PlayerSprite/Particles.emitting = fire > 0
     $PlayerSprite/Particles.lifetime = max(0.01, max(0, fire)/max_fire)
@@ -285,17 +285,17 @@ func _on_FlameExtinguishArea_body_entered(body):
     fire = 0
     pass # Replace with function body.
 
-func defer_cleanup_splash(effect : Node):
-    yield(get_tree().create_timer(1), "timeout")
-    remove_child(effect)
-
-func _on_WaterDepthTrick_body_entered(body):
+func produce_splash():
     var effect = preload("res://Objects/Splash.tscn").instance()
     effect.emitting = true
     effect.one_shot = true
     add_child(effect)
-    defer_cleanup_splash(effect)
+    yield(get_tree().create_timer(1), "timeout")
+    remove_child(effect)
+
+func _on_WaterDepthTrick_body_entered(body):
     Manager.play_oneshot_sound_effect("splash", global_position)
+    produce_splash()
     z_index = 0
     $PlayerSprite/Particles.z_index = 0
     in_water = true
@@ -316,6 +316,7 @@ func do_damage():
     movement_damage_cooldown = movement_damage_cooldown_max
     velocity = (-velocity + Vector2(-look_direction*20, -50)).normalized()*150
     velocity.x = clamp(velocity.x, -topspeed, topspeed)
+    produce_splash()
 
 func _on_Death_body_entered(body):
     num_damage_bodies_in += 1

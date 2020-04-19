@@ -208,7 +208,7 @@ position = Vector2( 2, -1 )
 texture = ExtResource( 3 )
 offset = Vector2( 4, 0 )
 texture_scale = 4.0
-color = Color( 1, 1, 1, 0.647059 )
+color = Color( 1, 1, 1, 0.784314 )
 shadow_enabled = true
 shadow_buffer_size = 128
 shadow_filter = 1
@@ -258,7 +258,6 @@ margin_bottom = 104.0
 rect_rotation = -90.0
 custom_styles/fg = SubResource( 11 )
 custom_styles/bg = SubResource( 12 )
-rounded = true
 percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false

@@ -74,7 +74,11 @@ func fadeout_start():
 func _onready():
     $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
 
+
+var stored_danger = 1.0
+
 func set_danger(danger : float):
+    stored_danger = danger
     $CanvasLayer/Danger.modulate.a = 1-pow(danger, 2)
     if danger <= 0:
         $CanvasLayer/Overlay.texture = preload("res://Sprites/death.png")

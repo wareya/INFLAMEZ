@@ -99,6 +99,7 @@ texture = ExtResource( 1 )
 hframes = 3
 
 [node name="Sprite" type="Sprite" parent="Sprite"]
+visible = false
 light_mask = 0
 z_index = 2
 texture = ExtResource( 1 )
@@ -114,10 +115,20 @@ damping = 67.65
 damping_curve = SubResource( 4 )
 
 [node name="Light2D" type="Light2D" parent="Sprite"]
+enabled = false
 texture = ExtResource( 3 )
 offset = Vector2( 0, -1 )
-color = Color( 1, 1, 1, 0.647059 )
+color = Color( 1, 1, 1, 0.784314 )
 shadow_enabled = true
+shadow_buffer_size = 64
+shadow_filter = 1
+shadow_filter_smooth = 1.0
+
+[node name="HiddenLight" type="Light2D" parent="Sprite"]
+texture = ExtResource( 3 )
+offset = Vector2( 0, -1 )
+color = Color( 1, 0.32549, 0.192157, 1 )
+energy = 0.0
 shadow_buffer_size = 64
 shadow_filter = 1
 shadow_filter_smooth = 1.0
