@@ -59,9 +59,16 @@ func set_danger(danger : float):
     if danger <= 0:
         $CanvasLayer/Overlay.texture = preload("res://Sprites/death.png")
         $AnimationPlayer.current_animation = "fadeout"
-        $BGM/Anim.current_animation = "fadeout_slow"
         simulate = false
     pass
+
+func reload_level():
+    get_tree().reload_current_scene()
+    $AnimationPlayer.stop()
+    $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
+    $CanvasLayer/Danger.modulate.a = 0
+    $CanvasLayer/Overlay.modulate.a = 0
+    simulate = true
 
 func change_level(path : String):
     simulate = false

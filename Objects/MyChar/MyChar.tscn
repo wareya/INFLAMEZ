@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Sprites/punk rocker.png" type="Texture" id=1]
 [ext_resource path="res://Sprites/punk rocker flame.png" type="Texture" id=2]
 [ext_resource path="res://Sprites/light.png" type="Texture" id=3]
+[ext_resource path="res://Objects/FlameParticles.tscn" type="PackedScene" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends KinematicBody2D
@@ -28,10 +29,13 @@ var max_life = 15.0
 var life = max_life
 
 const walljump_consumed_fire = 5.0
-const walljump_timer_max = 1.0
+const walljump_timer_max = 1
+const second_walljump_timer_max = 0.7
+var second_walljump_timer = 0
 var walljump_timer = 0
 var walljumping_enabled = true
 var walljump_xvel = 0 # dynamic
+var last_walljump_dir = 0
 
 func get_which_wall_collided():
     for i in range(get_slide_count()):
@@ -45,6 +49,12 @@ func get_which_wall_collided():
 var was_on_ground_last_frame = false
 
 func _physics_process(delta):
+    if Input.is_action_just_pressed(\"restart\") and life <= 0:
+        Manager.reload_level()
+        life = max_life
+        fire = max_fire
+        pass
+    
     $Camera/Fire.visible = Manager.simulate
     if Manager.simulate == false:
         return
@@ -84,17 +94,22 @@ func _physics_process(delta):
         walljump_timer = 0
         want_to_jump = false
     
+    if second_walljump_timer > 0:
+        second_walljump_timer -= delta
+    
     if want_to_jump and (is_on_floor() or was_on_ground_last_frame):
         velocity.y = -jumpspeed
         want_to_jump = false
     was_on_ground_last_frame = is_on_floor()
     if walljumping_enabled and want_to_jump and is_on_wall():
         var walldir = get_which_wall_collided()
-        if walldir != 0:
+        if walldir != 0 and (last_walljump_dir != walldir or second_walljump_timer <= 0):
+            last_walljump_dir = walldir
             velocity.y = -jumpspeed*0.8
             velocity.x = topspeed*walldir
             walljump_xvel = velocity.x
             walljump_timer = walljump_timer_max
+            second_walljump_timer = second_walljump_timer_max
             want_to_jump = false
             fire -= walljump_consumed_fire
     
@@ -110,12 +125,14 @@ func _physics_process(delta):
                 torch.lit = fire
             if torch.lit:
                 fire = max_fire
-        pass
     
-    for exit in get_tree().get_nodes_in_group(\"Exit\"):
-        if exit.overlaps_body(self):
-            Manager.change_level(exit.target)
-        pass
+    if fire > 0:
+        for exit in get_tree().get_nodes_in_group(\"Exit\"):
+            if exit.overlaps_body(self):
+                Manager.change_level(exit.target)
+    
+    
+    
     velocity.y += gravity*delta/2
     
     var floor_snap = Vector2(0, 4)
@@ -129,6 +146,8 @@ func _physics_process(delta):
         velocity.y = -bad_slope_limit
     
     velocity.y += gravity*delta/2
+    
+    
     
     $Camera.position = Vector2(0, 0)
     $Camera.global_position.x = round($Camera.global_position.x)
@@ -147,9 +166,14 @@ func _physics_process(delta):
         $PlayerSprite/FlameSprite/Light.energy = 0
         $PlayerSprite/FlameSprite.visible = false
         life -= delta
+    
     Manager.set_danger(life/max_life)
     $Camera/Fire.value = fire/max_fire*100
-        
+    
+    $PlayerSprite/Particles.lifetime = max(0, fire)/max_fire
+    $PlayerSprite/Particles.modulate.a = sqrt(sqrt(max(0, fire)/max_fire))
+    $PlayerSprite/Particles.direction = Vector2(velocity.x * look_direction, velocity.y*0.5).normalized()
+    $PlayerSprite/Particles.initial_velocity = velocity.length()*0.5
     
     if !is_on_floor():
         $PlayerSprite/Anim.current_animation = \"jump\"
@@ -164,7 +188,6 @@ func _physics_process(delta):
 "
 
 [sub_resource type="Animation" id=2]
-resource_name = "normal"
 length = 0.4
 loop = true
 tracks/0/type = "value"
@@ -181,7 +204,6 @@ tracks/0/keys = {
 }
 
 [sub_resource type="Animation" id=3]
-resource_name = "jump"
 loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:frame")
@@ -209,7 +231,6 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id=4]
-resource_name = "stand"
 loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:frame")
@@ -237,7 +258,6 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id=5]
-resource_name = "walk"
 length = 0.4
 loop = true
 tracks/0/type = "value"
@@ -294,6 +314,7 @@ anti_aliasing = false
 [node name="MyChar" type="KinematicBody2D" groups=[
 "Player",
 ]]
+z_index = 10
 collision_mask = 2
 script = SubResource( 1 )
 
@@ -308,6 +329,8 @@ texture = ExtResource( 1 )
 offset = Vector2( 0, -4 )
 hframes = 4
 
+[node name="Particles" parent="PlayerSprite" instance=ExtResource( 4 )]
+
 [node name="FlameSprite" type="Sprite" parent="PlayerSprite"]
 light_mask = 0
 texture = ExtResource( 2 )
@@ -318,6 +341,7 @@ position = Vector2( 2, -1 )
 texture = ExtResource( 3 )
 offset = Vector2( 4, 0 )
 texture_scale = 4.0
+color = Color( 1, 0.839216, 0.803922, 1 )
 shadow_enabled = true
 shadow_buffer_size = 128
 shadow_filter = 1

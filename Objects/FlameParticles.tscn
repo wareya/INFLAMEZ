@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="Curve" id=1]
+min_value = -204.8
+max_value = 100.0
+_data = [ Vector2( 0.0729167, -204.8 ), 0.0, 0.0, 0, 0, Vector2( 0.71875, 100 ), 0.0, 0.0, 0, 0, Vector2( 0.984375, 100 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="Gradient" id=2]
+offsets = PoolRealArray( 0, 0.609467, 1 )
+colors = PoolColorArray( 0.933594, 0.35044, 0.306335, 1, 1, 0.705627, 0.289063, 0.764706, 1, 0.679688, 0, 0 )
+
+[node name="Particles" type="CPUParticles2D"]
+light_mask = 0
+position = Vector2( 6, -2 )
+z_index = -1
+amount = 30
+speed_scale = 0.37
+randomness = 1.0
+lifetime_randomness = 1.0
+local_coords = false
+emission_shape = 2
+emission_rect_extents = Vector2( 2, 0.5 )
+spread = 0.0
+gravity = Vector2( 0, -40 )
+initial_velocity = 3.0
+initial_velocity_random = 1.0
+damping = 71.56
+damping_curve = SubResource( 1 )
+scale_amount = 1.5
+scale_amount_random = 1.0
+color_ramp = SubResource( 2 )
+hue_variation = 0.05
+hue_variation_random = 1.0
