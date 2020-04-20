@@ -157,6 +157,7 @@ func _physics_process(delta):
     
     for trinket in get_tree().get_nodes_in_group("Trinket"):
         if trinket.overlaps_body(self):
+            Manager.tokens += 1
             trinket.acquire()
             Manager.play_oneshot_sound_effect_screenlocal("trinketpickup")
     
@@ -246,6 +247,7 @@ func _physics_process(delta):
         $PlayerSprite/FlameSprite.visible = true
         life = max_life
         if fire <= 0:
+            Manager.fizzles += 1
             Manager.play_oneshot_sound_effect("torchgoesout", global_position)
     else:
         $PlayerSprite/FlameSprite/Light.energy = 0
@@ -284,6 +286,7 @@ func _physics_process(delta):
 
 func _on_FlameExtinguishArea_body_entered(body):
     if fire > 0:
+        Manager.fizzles += 1
         Manager.play_oneshot_sound_effect("torchgoesout", global_position)
     fire = 0
     pass # Replace with function body.

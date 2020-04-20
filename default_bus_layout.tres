@@ -4,11 +4,12 @@
 resource_name = "Limiter"
 
 [resource]
+bus/0/volume_db = 0.176138
 bus/0/effect/0/effect = SubResource( 1 )
 bus/0/effect/0/enabled = true
 bus/1/name = "Music"
 bus/1/solo = false
 bus/1/mute = false
 bus/1/bypass_fx = false
-bus/1/volume_db = -8.79822
+bus/1/volume_db = -8.82098
 bus/1/send = "Master"

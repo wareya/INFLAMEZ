@@ -21,6 +21,13 @@ var current_music = ""
 
 var found_trinkets : Dictionary = {}
 
+var deaths = 0
+var fizzles = 0
+var tokens_seen = 0
+var tokens = 0
+var torches_seen = 0
+var torches = 0
+
 func play_bgm(music = null):
     var file = "res://Music/" + music + ".ogg"
     if current_music == file:
@@ -74,15 +81,16 @@ func fadeout_start():
 func _onready():
     $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
 
-
 var stored_danger = 1.0
 
 func set_danger(danger : float):
     stored_danger = danger
     $CanvasLayer/Danger.modulate.a = 1-pow(danger, 2)
     if danger <= 0:
+        deaths += 1
         var scene_name = get_tree().get_current_scene().filename
         if found_trinkets.has(scene_name):
+            Manager.tokens -= 1
             found_trinkets.erase(scene_name)
             pass
         $CanvasLayer/Overlay.texture = preload("res://Sprites/death.png")
@@ -100,6 +108,11 @@ func reload_level():
     simulate = true
 
 func change_level(path : String):
+    for torch in get_tree().get_nodes_in_group("StandTorch"):
+        if torch.lit:
+            torches += 1
+        torches_seen += 1
+    tokens_seen += 1
     simulate = false
     $AnimationPlayer.current_animation = "fadeout"
     var loader = ResourceLoader.load_interactive(path)
