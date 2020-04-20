@@ -48,6 +48,9 @@ const movement_damage_cooldown_max = 0.5
 var movement_damage_cooldown = 0
 var num_damage_bodies_in = 0
 
+const skip_level_timer_max = 8
+var skip_level_timer = skip_level_timer_max
+
 func _physics_process(delta):
     if Input.is_action_just_pressed("restart") and life <= 0:
         Manager.reload_level()
@@ -57,6 +60,21 @@ func _physics_process(delta):
     $Canvas/Fire.visible = Manager.simulate
     if Manager.simulate == false:
         return
+    
+    if Input.is_action_pressed("skip"):
+        skip_level_timer -= delta
+        if skip_level_timer <= 0:
+            for exit in get_tree().get_nodes_in_group("Exit"):
+                Manager.change_level(exit.target)
+                velocity.x = 0
+                if is_on_floor():
+                    $PlayerSprite/Anim.current_animation = "stand"
+                else:
+                    $PlayerSprite/Anim.current_animation = "jump"
+                return
+    else:
+        skip_level_timer = skip_level_timer_max
+    
     var previous_walk_state = walk_state
     if Input.is_action_pressed("ui_left") and !Input.is_action_pressed("ui_right"):
         walk_state = -1
@@ -160,6 +178,10 @@ func _physics_process(delta):
             Manager.tokens += 1
             trinket.acquire()
             Manager.play_oneshot_sound_effect_screenlocal("trinketpickup")
+    
+    for switch in get_tree().get_nodes_in_group("Switch"):
+        if switch.overlaps_body(self):
+            switch.set_on()
     
     for torch in get_tree().get_nodes_in_group("StandTorch"):
         if torch.overlaps_body(self):

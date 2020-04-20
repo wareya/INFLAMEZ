@@ -119,8 +119,8 @@ tracks/1/keys = {
 extents = Vector2( 3, 6 )
 
 [sub_resource type="CapsuleShape2D" id=8]
-radius = 2.9
-height = 6.5
+radius = 2.5
+height = 7.0
 
 [sub_resource type="RectangleShape2D" id=9]
 extents = Vector2( 1, 1 )
@@ -128,10 +128,10 @@ extents = Vector2( 1, 1 )
 [sub_resource type="ConvexPolygonShape2D" id=10]
 points = PoolVector2Array( -3, -4.5, 0, -6, 3, -4.5, 3, 6.5, 0, 8, -3, 6.5 )
 
-[sub_resource type="ConvexPolygonShape2D" id=13]
+[sub_resource type="ConvexPolygonShape2D" id=11]
 points = PoolVector2Array( -3, -4.5, 0, -6, 3, -4.5, 3, 8, -3, 8 )
 
-[sub_resource type="StyleBoxFlat" id=11]
+[sub_resource type="StyleBoxFlat" id=12]
 bg_color = Color( 0.901961, 0.431373, 0.32549, 1 )
 border_width_left = 1
 border_width_top = 1
@@ -140,7 +140,7 @@ border_width_bottom = 1
 border_color = Color( 0, 0, 0, 0 )
 anti_aliasing = false
 
-[sub_resource type="StyleBoxFlat" id=12]
+[sub_resource type="StyleBoxFlat" id=13]
 bg_color = Color( 0.231373, 0.231373, 0.231373, 0.333333 )
 border_width_left = 1
 border_width_top = 1
@@ -242,7 +242,6 @@ collision_layer = 0
 collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerSprite/Death"]
-visible = false
 position = Vector2( 0, 1 )
 shape = SubResource( 8 )
 
@@ -260,7 +259,7 @@ shape = SubResource( 10 )
 disabled = true
 
 [node name="Hull2" type="CollisionShape2D" parent="."]
-shape = SubResource( 13 )
+shape = SubResource( 11 )
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 
@@ -271,8 +270,8 @@ margin_top = 96.0
 margin_right = 360.0
 margin_bottom = 104.0
 rect_rotation = -90.0
-custom_styles/fg = SubResource( 11 )
-custom_styles/bg = SubResource( 12 )
+custom_styles/fg = SubResource( 12 )
+custom_styles/bg = SubResource( 13 )
 percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
