@@ -19,8 +19,9 @@ var simulate = false
 
 var current_music = ""
 
+var found_trinkets : Dictionary = {}
+
 func play_bgm(music = null):
-    
     var file = "res://Music/" + music + ".ogg"
     if current_music == file:
         return
@@ -29,11 +30,10 @@ func play_bgm(music = null):
     if simulate == false:
         yield(self, "fadein_done")
     
-    if File.new().file_exists(file):
-        var asdf = load(file)
-        $BGM.stream = asdf
-        $BGM.play()
-        print("playing " + file)
+    var asdf = load(file)
+    $BGM.stream = asdf
+    $BGM.play()
+    print("playing " + file)
 
 func play_oneshot_sound_effect(name : String, _global_position : Vector2):
     var effect = load("res://Sounds/"+name+".wav")
@@ -81,12 +81,17 @@ func set_danger(danger : float):
     stored_danger = danger
     $CanvasLayer/Danger.modulate.a = 1-pow(danger, 2)
     if danger <= 0:
+        var scene_name = get_tree().get_current_scene().filename
+        if found_trinkets.has(scene_name):
+            found_trinkets.erase(scene_name)
+            pass
         $CanvasLayer/Overlay.texture = preload("res://Sprites/death.png")
         $AnimationPlayer.current_animation = "fadeout"
         simulate = false
     pass
 
 func reload_level():
+    print("reloading level")
     get_tree().reload_current_scene()
     $AnimationPlayer.stop()
     $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
@@ -108,7 +113,6 @@ func change_level(path : String):
     pass
 
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#    pass
+func _process(delta):
+    if stored_danger <= 0:
+        $CanvasLayer/Danger.modulate.a = 1

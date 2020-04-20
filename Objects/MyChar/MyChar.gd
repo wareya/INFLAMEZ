@@ -1,15 +1,15 @@
 extends KinematicBody2D
 
 func _ready():
-    pass
+    $PlayerSprite.transform.x.x = look_direction
 
-const topspeed = 75.0
+const topspeed = 77.7
 const jumpspeed = 190.0
 const gravity = 500.0
 const bad_slope_limit = 0.7 # not a normal
 
 var walk_state = 0
-var look_direction = 1
+export var look_direction = 1
 
 var velocity : Vector2 = Vector2(0, 0)
 
@@ -51,10 +51,8 @@ var num_damage_bodies_in = 0
 func _physics_process(delta):
     if Input.is_action_just_pressed("restart") and life <= 0:
         Manager.reload_level()
-        life = max_life
-        fire = max_fire
         Manager.play_oneshot_sound_effect_screenlocal("respawn")
-        pass
+        return
     
     $Canvas/Fire.visible = Manager.simulate
     if Manager.simulate == false:
@@ -89,7 +87,7 @@ func _physics_process(delta):
         if walljump_timer <= 0:
             velocity.x = walk_state * topspeed
             if is_on_wall():
-                velocity.x *= 0.1
+                velocity.x *= 0.01
         if walljump_timer > 0:
             var derp = walljump_timer/walljump_timer_max
             derp = derp*derp
@@ -132,7 +130,7 @@ func _physics_process(delta):
             if walldir == 0 and scan_right_result != null and scan_right_result.normal.x < -0.9:
                 walldir = -1
             if walldir != 0 and (last_walljump_dir != walldir or second_walljump_timer <= 0):
-                if velocity.x == 0 or sign(velocity.x) != sign(walldir):
+                if velocity.x == 0 or sign(velocity.x) != sign(walldir) and movement_damage_cooldown == 0:
                     $WallGrindParticles.emitting = true
                     $WallGrindParticles.position.x = -4*walldir
                 if want_to_jump:
@@ -156,6 +154,11 @@ func _physics_process(delta):
     
     if is_on_floor() and walk_state == 0 and previous_walk_state != 0 and velocity.y < 0 and !just_jumped and damage_cooldown <= 0:
         velocity.y = 0
+    
+    for trinket in get_tree().get_nodes_in_group("Trinket"):
+        if trinket.overlaps_body(self):
+            trinket.acquire()
+            Manager.play_oneshot_sound_effect_screenlocal("trinketpickup")
     
     for torch in get_tree().get_nodes_in_group("StandTorch"):
         if torch.overlaps_body(self):
@@ -325,3 +328,9 @@ func _on_Death_body_entered(body):
 
 func _on_Death_body_exited(body):
     num_damage_bodies_in -= 1
+
+
+func _on_TRUDEATH_body_entered(body):
+    fire = 0
+    life = 0
+    Manager.play_oneshot_sound_effect_screenlocal("deathtrigger")
