@@ -39,7 +39,6 @@ tile_data = PoolIntArray( -65554, 0, 0, -65544, 0, 4, -65540, 0, 4, -65531, 0, 0
 
 [node name="MyChar" parent="." instance=ExtResource( 2 )]
 position = Vector2( -88, 40 )
-look_direction = -1
 
 [node name="Trinket" parent="." instance=ExtResource( 10 )]
 position = Vector2( 64, 96 )

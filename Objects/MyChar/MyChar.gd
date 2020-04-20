@@ -51,6 +51,11 @@ var num_damage_bodies_in = 0
 const skip_level_timer_max = 8
 var skip_level_timer = skip_level_timer_max
 
+const restart_timer_max = 2.5
+var restart_timer = restart_timer_max
+
+var knockback_momentum = Vector2(0, 0)
+
 func _physics_process(delta):
     if Input.is_action_just_pressed("restart") and life <= 0:
         Manager.reload_level()
@@ -75,6 +80,14 @@ func _physics_process(delta):
     else:
         skip_level_timer = skip_level_timer_max
     
+    if Input.is_action_pressed("restart"):
+        restart_timer -= delta
+        if restart_timer <= 0:
+            Manager.reload_level()
+            Manager.play_oneshot_sound_effect_screenlocal("respawn")
+    else:
+        restart_timer = restart_timer_max
+    
     var previous_walk_state = walk_state
     if Input.is_action_pressed("ui_left") and !Input.is_action_pressed("ui_right"):
         walk_state = -1
@@ -94,12 +107,22 @@ func _physics_process(delta):
     if walk_state != 0:
         look_direction = walk_state
     
-    if movement_damage_cooldown > 0:
-        walk_state = 0
     
     $PlayerSprite.transform.x.x = look_direction
     
     var just_jumped = false
+    
+    if movement_damage_cooldown > 0 and movement_damage_cooldown <= movement_damage_cooldown_max*0.5:
+        if walljump_timer <= 0:
+            velocity.x = walk_state * topspeed
+            if is_on_wall():
+                velocity.x *= 0.01
+        if walljump_timer > 0:
+            var derp = walljump_timer/walljump_timer_max
+            derp = derp*derp
+            velocity.x = lerp(walljump_xvel, walk_state * topspeed, 1-derp)
+            walljump_timer -= delta
+        velocity.x = lerp(velocity.x, knockback_momentum.x, 0.65)
     
     if movement_damage_cooldown <= 0:
         if walljump_timer <= 0:
@@ -118,6 +141,7 @@ func _physics_process(delta):
         if !Input.is_action_pressed("jump"):
             walljump_timer = 0
             want_to_jump = false
+    
     elif walljump_timer > 0:
         walljump_timer -= delta
     
@@ -344,6 +368,7 @@ func do_damage():
     movement_damage_cooldown = movement_damage_cooldown_max
     velocity = (-velocity + Vector2(-look_direction*20, -50)).normalized()*150
     velocity.x = clamp(velocity.x, -topspeed, topspeed)
+    knockback_momentum = Vector2(velocity.x, velocity.y)
     produce_splash()
 
 func _on_Death_body_entered(body):
