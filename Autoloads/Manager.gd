@@ -92,7 +92,6 @@ func set_danger(danger : float):
     stored_danger = danger
     $CanvasLayer/Danger.modulate.a = 1-pow(danger, 2)
     if danger <= 0:
-        deaths += 1
         var scene_name = get_tree().get_current_scene().filename
         $CanvasLayer/Overlay.texture = preload("res://Sprites/death.png")
         $AnimationPlayer.current_animation = "fadeout"
