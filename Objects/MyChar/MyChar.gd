@@ -210,7 +210,11 @@ func _physics_process(delta):
                     want_to_jump = false
                     just_jumped = true
                     if !Manager.assist:
-                        fire -= walljump_consumed_fire
+                        if fire > 0:
+                            fire -= walljump_consumed_fire
+                            if fire <= 0:
+                                Manager.fizzles += 1
+                                Manager.play_oneshot_sound_effect("torchgoesout", global_position)
                     Manager.play_oneshot_sound_effect_screenlocal("jump")
                     $WallJumpParticles.restart()
                     $WallJumpParticles.direction.x = float(walldir)
