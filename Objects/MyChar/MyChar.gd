@@ -92,6 +92,7 @@ func _physics_process(delta):
         if restart_timer <= 0:
             Manager.reload_level()
             Manager.play_oneshot_sound_effect_screenlocal("respawn")
+            restart_timer = restart_timer_max
     else:
         restart_timer = restart_timer_max
     

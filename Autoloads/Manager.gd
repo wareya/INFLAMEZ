@@ -94,24 +94,30 @@ func set_danger(danger : float):
     if danger <= 0:
         deaths += 1
         var scene_name = get_tree().get_current_scene().filename
-        if !assist and found_trinkets.has(scene_name):
-            tokens -= 1
-            found_trinkets.erase(scene_name)
         $CanvasLayer/Overlay.texture = preload("res://Sprites/death.png")
         $AnimationPlayer.current_animation = "fadeout"
         simulate = false
     pass
 
 func reload_level():
-    var scene_name = get_tree().get_current_scene().filename
-    if !assist and found_trinkets.has(scene_name):
-        tokens -= 1
-        found_trinkets.erase(scene_name)
-    get_tree().reload_current_scene()
-    $AnimationPlayer.stop()
-    $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
-    $CanvasLayer/Danger.modulate.a = 0
-    $CanvasLayer/Overlay.modulate.a = 0
+    deaths += 1
+    if assist and last_visited_torch_position != null:
+        for player in get_tree().get_nodes_in_group("Player"):
+            player.global_position = last_visited_torch_position
+            player.life = player.max_life
+            player.fire = player.max_fire
+            $CanvasLayer/Danger.modulate.a = 0
+            stored_danger = 1
+    else:
+        var scene_name = get_tree().get_current_scene().filename
+        if !assist and found_trinkets.has(scene_name):
+            tokens -= 1
+            found_trinkets.erase(scene_name)
+        get_tree().reload_current_scene()
+        $AnimationPlayer.stop()
+        $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
+        $CanvasLayer/Danger.modulate.a = 0
+        $CanvasLayer/Overlay.modulate.a = 0
     simulate = true
 
 func change_level(path : String):
@@ -127,7 +133,7 @@ func change_level(path : String):
     loader.wait()
     var target = loader.get_resource()
     print("changing to...")
-    print(target)
+    print(path)
     get_tree().change_scene_to(target)
     last_visited_torch_position = null
     $AnimationPlayer.current_animation = "fadein"

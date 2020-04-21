@@ -10,7 +10,7 @@ extends Node2D
 func _ready():
     var assist_text = ""
     if Manager.assist:
-        assist_text = "ASSIST MODE ENABLED"
+        assist_text = "ASSIST MODE ON"
     var skip_text = ""
     if Manager.skip_used:
         skip_text = "SKIP USED"
@@ -25,7 +25,7 @@ DEATHS: %d
     [Manager.tokens, Manager.tokens_seen,
     Manager.torches, Manager.torches_seen,
     Manager.fizzles,
-    Manager.deaths, assist_text]
+    Manager.deaths, assist_text, skip_text]
     pass # Replace with function body.
 
 
