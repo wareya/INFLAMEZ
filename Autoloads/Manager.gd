@@ -27,6 +27,11 @@ var tokens_seen = 0
 var tokens = 0
 var torches_seen = 0
 var torches = 0
+var assist = false
+
+var last_visited_torch_position = null
+
+var skip_used = false
 
 func play_bgm(music = null):
     var file = "res://Music/" + music + ".ogg"
@@ -89,17 +94,19 @@ func set_danger(danger : float):
     if danger <= 0:
         deaths += 1
         var scene_name = get_tree().get_current_scene().filename
-        if found_trinkets.has(scene_name):
-            Manager.tokens -= 1
+        if !assist and found_trinkets.has(scene_name):
+            tokens -= 1
             found_trinkets.erase(scene_name)
-            pass
         $CanvasLayer/Overlay.texture = preload("res://Sprites/death.png")
         $AnimationPlayer.current_animation = "fadeout"
         simulate = false
     pass
 
 func reload_level():
-    print("reloading level")
+    var scene_name = get_tree().get_current_scene().filename
+    if !assist and found_trinkets.has(scene_name):
+        tokens -= 1
+        found_trinkets.erase(scene_name)
     get_tree().reload_current_scene()
     $AnimationPlayer.stop()
     $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
@@ -122,6 +129,7 @@ func change_level(path : String):
     print("changing to...")
     print(target)
     get_tree().change_scene_to(target)
+    last_visited_torch_position = null
     $AnimationPlayer.current_animation = "fadein"
     pass
 

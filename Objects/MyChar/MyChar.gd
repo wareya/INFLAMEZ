@@ -2,6 +2,9 @@ extends KinematicBody2D
 
 func _ready():
     $PlayerSprite.transform.x.x = look_direction
+    if Manager.assist:
+        if Manager.last_visited_torch_position != null:
+            global_position = Manager.last_visited_torch_position
 
 const topspeed = 77.7
 const jumpspeed = 190.0
@@ -54,6 +57,9 @@ var skip_level_timer = skip_level_timer_max
 const restart_timer_max = 2.5
 var restart_timer = restart_timer_max
 
+const assist_timer_max = 8
+var assist_timer = assist_timer_max
+
 var knockback_momentum = Vector2(0, 0)
 
 func _physics_process(delta):
@@ -70,6 +76,7 @@ func _physics_process(delta):
         skip_level_timer -= delta
         if skip_level_timer <= 0:
             for exit in get_tree().get_nodes_in_group("Exit"):
+                Manager.skip_used = true
                 Manager.change_level(exit.target)
                 velocity.x = 0
                 if is_on_floor():
@@ -87,6 +94,13 @@ func _physics_process(delta):
             Manager.play_oneshot_sound_effect_screenlocal("respawn")
     else:
         restart_timer = restart_timer_max
+    
+    if !Manager.assist and Input.is_action_pressed("assist"):
+        assist_timer -= delta
+        if assist_timer <= 0:
+            Manager.assist = true
+    else:
+        assist_timer = assist_timer_max
     
     var previous_walk_state = walk_state
     if Input.is_action_pressed("ui_left") and !Input.is_action_pressed("ui_right"):
@@ -111,6 +125,16 @@ func _physics_process(delta):
     $PlayerSprite.transform.x.x = look_direction
     
     var just_jumped = false
+
+    if movement_damage_cooldown > movement_damage_cooldown_max*0.5:
+        $PlayerSprite.modulate.g = 0.5
+        $PlayerSprite.modulate.b = 0.5
+    elif movement_damage_cooldown > 0:
+        $PlayerSprite.modulate.g = 0.75
+        $PlayerSprite.modulate.b = 0.75
+    else:
+        $PlayerSprite.modulate.g = 1
+        $PlayerSprite.modulate.b = 1
     
     if movement_damage_cooldown > 0 and movement_damage_cooldown <= movement_damage_cooldown_max*0.5:
         if walljump_timer <= 0:
@@ -122,7 +146,7 @@ func _physics_process(delta):
             derp = derp*derp
             velocity.x = lerp(walljump_xvel, walk_state * topspeed, 1-derp)
             walljump_timer -= delta
-        velocity.x = lerp(velocity.x, knockback_momentum.x, 0.65)
+        velocity.x = lerp(velocity.x, knockback_momentum.x, 0.60)
     
     if movement_damage_cooldown <= 0:
         if walljump_timer <= 0:
@@ -184,7 +208,8 @@ func _physics_process(delta):
                     second_walljump_timer = second_walljump_timer_max
                     want_to_jump = false
                     just_jumped = true
-                    fire -= walljump_consumed_fire
+                    if !Manager.assist:
+                        fire -= walljump_consumed_fire
                     Manager.play_oneshot_sound_effect_screenlocal("jump")
                     $WallJumpParticles.restart()
                     $WallJumpParticles.direction.x = float(walldir)
@@ -209,6 +234,8 @@ func _physics_process(delta):
     
     for torch in get_tree().get_nodes_in_group("StandTorch"):
         if torch.overlaps_body(self):
+            if torch.lit:
+                Manager.last_visited_torch_position = torch.global_position
             var played_sound = false
             if fire > 0:
                 if !torch.lit:
@@ -288,7 +315,8 @@ func _physics_process(delta):
     
     if fire > 0:
         fire -= delta
-        fire -= min(velocity.length_squared()/1500, 15)*delta
+        if !Manager.assist:
+            fire -= min(velocity.length_squared()/1500, 15)*delta
         $PlayerSprite/FlameSprite/Light.energy = sqrt(fire/max_fire)
         $PlayerSprite/FlameSprite.visible = true
         life = max_life

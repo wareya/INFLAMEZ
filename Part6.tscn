@@ -90,4 +90,4 @@ position = Vector2( -512, 40 )
 
 [node name="Exit" parent="." instance=ExtResource( 6 )]
 position = Vector2( -552, 40 )
-target = "res://PartFinal.tscn"
+target = "res://Part7.tscn"
