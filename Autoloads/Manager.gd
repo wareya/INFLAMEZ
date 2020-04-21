@@ -100,24 +100,27 @@ func set_danger(danger : float):
     pass
 
 func reload_level():
+    $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
     deaths += 1
     if assist and last_visited_torch_position != null:
         for player in get_tree().get_nodes_in_group("Player"):
             player.global_position = last_visited_torch_position
+            player.velocity = Vector2(0, 0)
             player.life = player.max_life
             player.fire = player.max_fire
+            $AnimationPlayer.stop()
             $CanvasLayer/Danger.modulate.a = 0
+            $CanvasLayer/Overlay.modulate.a = 0
             stored_danger = 1
     else:
         var scene_name = get_tree().get_current_scene().filename
         if !assist and found_trinkets.has(scene_name):
             tokens -= 1
             found_trinkets.erase(scene_name)
-        get_tree().reload_current_scene()
         $AnimationPlayer.stop()
-        $CanvasLayer/Overlay.texture = preload("res://Sprites/splash.png")
         $CanvasLayer/Danger.modulate.a = 0
         $CanvasLayer/Overlay.modulate.a = 0
+        get_tree().reload_current_scene()
     simulate = true
 
 func change_level(path : String):
