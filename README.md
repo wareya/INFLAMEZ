@@ -9,3 +9,4 @@ post-jam TODO:
 - make trinkets inaccessible when torch is out
 - move the "ledge jump" torch so that it's not implying that it's necessary to ledge jump
 - make unlit torches brighter somehow
+- tweak spike knockback code
