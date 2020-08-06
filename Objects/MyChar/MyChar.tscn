@@ -284,6 +284,6 @@ current = true
 [connection signal="body_entered" from="PlayerSprite/FlameSprite/FlameExtinguishArea" to="." method="_on_FlameExtinguishArea_body_entered"]
 [connection signal="body_entered" from="PlayerSprite/WaterDepthTrick" to="." method="_on_WaterDepthTrick_body_entered"]
 [connection signal="body_exited" from="PlayerSprite/WaterDepthTrick" to="." method="_on_WaterDepthTrick_body_exited"]
-[connection signal="body_entered" from="PlayerSprite/Death" to="." method="_on_Death_body_entered"]
-[connection signal="body_exited" from="PlayerSprite/Death" to="." method="_on_Death_body_exited"]
+[connection signal="body_shape_entered" from="PlayerSprite/Death" to="." method="_on_Death_body_shape_entered"]
+[connection signal="body_shape_exited" from="PlayerSprite/Death" to="." method="_on_Death_body_shape_exited"]
 [connection signal="body_entered" from="TRUDEATH" to="." method="_on_TRUDEATH_body_entered"]

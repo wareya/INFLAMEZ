@@ -4,16 +4,16 @@
 [ext_resource path="res://Sprites/spikes_normals.png" type="Texture" id=2]
 
 [sub_resource type="OccluderPolygon2D" id=1]
-polygon = PoolVector2Array( 4, 16, 8, 0, 12, 16 )
+polygon = PoolVector2Array( 7, 16, 8, 0, 9, 16 )
 
 [sub_resource type="OccluderPolygon2D" id=2]
-polygon = PoolVector2Array( 4, 0, 8, 16, 12, 0 )
+polygon = PoolVector2Array( 7, 0, 8, 16, 9, 0 )
 
 [sub_resource type="OccluderPolygon2D" id=3]
-polygon = PoolVector2Array( 0, 8, 16, 4, 16, 12 )
+polygon = PoolVector2Array( 0, 8, 16, 7, 16, 9 )
 
 [sub_resource type="OccluderPolygon2D" id=4]
-polygon = PoolVector2Array( 0, 4, 16, 8, 0, 12 )
+polygon = PoolVector2Array( 0, 7, 16, 8, 0, 9 )
 
 [sub_resource type="AtlasTexture" id=5]
 atlas = ExtResource( 2 )

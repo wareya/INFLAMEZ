@@ -67,6 +67,10 @@ func _physics_process(delta):
         Manager.reload_level()
         Manager.play_oneshot_sound_effect_screenlocal("respawn")
         return
+        
+    if Input.is_action_pressed("mute"):
+        
+        pass
     
     $Canvas/Fire.visible = Manager.simulate
     if Manager.simulate == false:
@@ -404,16 +408,18 @@ func do_damage():
     knockback_momentum = Vector2(velocity.x, velocity.y)
     produce_splash()
 
-func _on_Death_body_entered(body):
-    num_damage_bodies_in += 1
-    if damage_cooldown <= 0:
-        do_damage()
-
-func _on_Death_body_exited(body):
-    num_damage_bodies_in -= 1
-
-
 func _on_TRUDEATH_body_entered(body):
     fire = 0
     life = 0
     Manager.play_oneshot_sound_effect_screenlocal("deathtrigger")
+
+func _on_Death_body_shape_entered(body_id, body, body_shape, area_shape):
+    print(body_id)
+    print(body.get_class())
+    print(body_shape)
+    num_damage_bodies_in += 1
+    if damage_cooldown <= 0:
+        do_damage()
+
+func _on_Death_body_shape_exited(body_id, body, body_shape, area_shape):
+    num_damage_bodies_in -= 1

@@ -76,7 +76,7 @@ position = Vector2( 520, -104 )
 position = Vector2( 264, 104 )
 
 [node name="StandTorch4" parent="." instance=ExtResource( 3 )]
-position = Vector2( -40, -8 )
+position = Vector2( -8, 56 )
 
 [node name="StandTorch3" parent="." instance=ExtResource( 3 )]
 position = Vector2( 168, -24 )
